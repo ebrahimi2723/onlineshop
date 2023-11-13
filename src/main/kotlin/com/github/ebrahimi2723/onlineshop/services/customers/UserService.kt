@@ -5,6 +5,7 @@ import com.github.ebrahimi2723.onlineshop.repositories.customers.UserRepository
 import com.github.ebrahimi2723.onlineshop.utils.NotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import javax.servlet.http.HttpServletRequest
 
 @Service
 class UserService {
@@ -32,7 +33,10 @@ class UserService {
     }
 
 
-    fun changePassword(data: User, repeatPassword: String,currentPassword:String): User? {
+    fun changePassword(data: User, repeatPassword: String,currentPassword:String ,currentUser: String): User? {
+
+        val username = repository.findFirstByUserName(currentUser)
+        if (username == null || data.id != username.id) throw NotFoundException("you dont have permission to change info")
         val checkUserExist = repository.findFirstById(data.id)?: return null
         if (data.password != repeatPassword) throw NotFoundException("password and repeatPassword not match")
         if (checkUserExist.password != currentPassword) throw NotFoundException("currentPassword is invalid")
@@ -40,7 +44,7 @@ class UserService {
 
 
         // TODO :CHECK PASSWORD STRENGTH
-        val oldData = getById(data.id) ?: return null
+        val oldData = repository.findFirstById(data.id) ?: return null
         oldData.password = data.password
         val value = repository.save(oldData)
         value.password = ""
@@ -49,9 +53,13 @@ class UserService {
     }
 
 
-    fun update(data: User): User? {
+    fun update(data: User , currentUser:String): User? {
+
+        val username = repository.findFirstByUserName(userName = currentUser)
+        if (username == null || username.id != data.id) throw NotFoundException("you don't have permission to change info")
 
         val oldCustomer = customerService.update(data.customer!!)
+        if (oldCustomer != null) throw NotFoundException("some thing wrong")
 //        oldCustomer!!.postalCode = data.customer!!.postalCode
 //        oldCustomer.firstName = data.customer!!.firstName
 //        oldCustomer.lastName = data.customer!!.lastName
@@ -63,11 +71,10 @@ class UserService {
 
     }
 
-    fun getById(id: Long): User? {
+    fun getByUsername(username: String): User? {
 
-        val data = repository.findById(id)
-        data.get().password = ""
-        return data.get()
+        if (username.isEmpty()) throw NotFoundException("username can't be empty")
+        return repository.findFirstByUserName(username)
 
     }
 
@@ -79,6 +86,7 @@ class UserService {
         if (data != null) {
             data.password = ""
         }
+
         return data
     }
 }

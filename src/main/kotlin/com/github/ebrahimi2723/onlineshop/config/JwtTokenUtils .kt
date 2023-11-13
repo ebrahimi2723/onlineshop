@@ -5,7 +5,6 @@ import com.github.ebrahimi2723.onlineshop.viewmodels.UserViewModel
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
 import java.util.Date;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value

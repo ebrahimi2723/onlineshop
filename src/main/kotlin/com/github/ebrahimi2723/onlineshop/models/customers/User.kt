@@ -23,6 +23,7 @@ data class User(
 
     //define foreign key    one to one
     // connect to tbl customer
+//    @JsonIgnore
     @OneToOne
     @JoinColumn(name = "customer_id")
     var customer: Customer? = null,
